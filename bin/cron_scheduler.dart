@@ -37,9 +37,9 @@ void main(List<String> arguments) {
 }
 
 Future<void> _etlGet(String path) => _httpClient.get(
-      '${_env['PATH_ETL']}$path',
+      '${_env.pathEtl}$path',
       headers: <String, dynamic>{
-        'supabaseUrl': _env['DATABASE_URL'],
-        'supabaseKey': _env['DATABASE_KEY'],
+        'supabaseUrl': _env.databaseUrl,
+        'supabaseKey': _env.databaseKey,
       },
     );
