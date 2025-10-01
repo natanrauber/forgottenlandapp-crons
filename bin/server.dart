@@ -1,9 +1,12 @@
+import 'dart:io';
+
+import 'package:dotenv/dotenv.dart';
 import 'package:forgottenlandapp_adapters/adapters.dart';
 import 'package:forgottenlandapp_crons/cron_scheduler.dart';
 import 'package:forgottenlandapp_utils/utils.dart';
 
-final List<String> _requiredVar = <String>['PATH_ETL', 'DATABASE_URL', 'DATABASE_KEY'];
-final Env _env = Env();
+final List<EnvVar> _required = <EnvVar>[EnvVar.pathEtl];
+late final Env _env;
 final IHttpClient _httpClient = MyDioClient(
   baseOptions: MyDioClient.defaultBaseOptions.copyWith(
     sendTimeout: Duration(minutes: 5),
@@ -12,9 +15,17 @@ final IHttpClient _httpClient = MyDioClient(
   ),
 );
 
-void main(List<String> arguments) {
-  _env.log();
-  if (_env.isMissingAny(_requiredVar)) return print('Missing required environment variable');
+Future<void> _loadEnv() async {
+  Map<String, String> localMap = <String, String>{}..addAll(Platform.environment);
+  final DotEnv dotEnv = DotEnv();
+  dotEnv.load();
+  // ignore: invalid_use_of_visible_for_testing_member
+  localMap.addAll(dotEnv.map);
+  _env = Env(env: localMap, required: _required);
+}
+
+void main(List<String> arguments) async {
+  await _loadEnv();
 
   List<CronJob> cronList = <CronJob>[
     CronJob(time: '*/5 * * * *', name: 'online', task: () => _etlGet('/online')),
@@ -36,10 +47,4 @@ void main(List<String> arguments) {
   }
 }
 
-Future<void> _etlGet(String path) => _httpClient.get(
-      '${_env.pathEtl}$path',
-      headers: <String, dynamic>{
-        'supabaseUrl': _env.databaseUrl,
-        'supabaseKey': _env.databaseKey,
-      },
-    );
+Future<void> _etlGet(String path) => _httpClient.get('${_env[EnvVar.pathEtl]}$path');

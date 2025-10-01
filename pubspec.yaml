@@ -1,13 +1,13 @@
 name: forgottenlandapp_crons
 description: Forgotten Land App crons
-version: 25.09.27+1
+version: 25.10.01+1
 publish_to: none
 
 environment:
   sdk: "3.6.0"
 
 dependencies:
-  cron: ^0.5.1
+  cron: ^0.6.2
   forgottenlandapp_utils:
     git:
       url: "https://github.com/natanrauber/forgottenlandapp-utils"
@@ -16,7 +16,8 @@ dependencies:
     git:
       url: "https://github.com/natanrauber/forgottenlandapp-adapters"
       ref: master
+  dotenv: ^4.2.0
 
 dev_dependencies:
-  lints: ^4.0.0
+  lints: ^5.1.1
   test: ^1.16.0
